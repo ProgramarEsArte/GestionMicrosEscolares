@@ -1,0 +1,6 @@
+@CompraGamer.Api_HostAddress = http://localhost:5037
+
+GET {{CompraGamer.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
