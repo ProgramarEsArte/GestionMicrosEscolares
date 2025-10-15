@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./CompraGamer.Api
+    ports:
+      - "5037:80"
+    depends_on:
+      - db
+    environment:
+      - ConnectionStrings__Default=Server=db;Database=gestionmicros;User=root;Password=;
+    networks:
+      - microsnet
+
+  frontend:
+    build: ./compra-gamer-frontend-angular
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    networks:
+      - microsnet
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: gestionmicros
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - microsnet
+
+volumes:
+  dbdata:
+
+networks:
+  microsnet:
