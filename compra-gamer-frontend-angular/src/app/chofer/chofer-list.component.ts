@@ -7,26 +7,54 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <h3>Choferes</h3>
-    <a routerLink="/choferes/new" class="create-link">Crear chofer</a>
-    <ul class="list">
-      <li *ngFor="let c of choferes">
-        {{c.dni}} - {{c.nombre}} {{c.apellido}}
-        <a [routerLink]="['/choferes', c.dni]" class="edit-link">Editar</a>
-      </li>
-    </ul>
-  `,
-  styles: [`
-    .list { list-style: none; padding: 0; }
-    .list li { padding: 8px; border-bottom: 1px solid #eee; }
-    .create-link { display: inline-block; margin-bottom: 1rem; padding: 8px 16px; background: #4CAF50; color: white; text-decoration: none; border-radius: 4px; }
-    .edit-link { margin-left: 1rem; padding: 4px 8px; background: #2196F3; color: white; text-decoration: none; border-radius: 4px; font-size: 0.9em; }
-  `]
+    <div class="page-container">
+      <div class="header-container">
+        <h3>Listado de Choferes</h3>
+        <a routerLink="/choferes/new" class="create-link">Nuevo Chofer</a>
+      </div>
+      <div class="list-container">
+        <ul class="list">
+          <li *ngFor="let c of choferes" class="list-item">
+            <div class="item-info">
+              <span class="item-title">{{c.nombre}} {{c.apellido}}</span>
+              <span class="item-detail">DNI: {{c.dni}}</span>
+            </div>
+            <div class="item-actions">
+              <a [routerLink]="['/choferes', c.dni]" class="edit-link">Editar</a>
+              <button (click)="deleteChofer(c.dni)" class="delete-button">Eliminar</button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  `
 })
 export class ChoferListComponent implements OnInit {
   choferes: any[] = [];
   constructor(private svc: ChoferService) {}
   ngOnInit(): void {
-    this.svc.getAll().subscribe(x => this.choferes = x);
+    this.loadChoferes();
+  }
+
+  loadChoferes(): void {
+    this.svc.getAll().subscribe({
+      next: (x) => this.choferes = x,
+      error: (error) => {
+        console.error('Error al cargar choferes:', error);
+        alert(error);
+      }
+    });
+  }
+
+  deleteChofer(dni: string): void {
+    if (confirm('¿Está seguro que desea eliminar este chofer?')) {
+      this.svc.delete(dni).subscribe({
+        next: () => this.loadChoferes(),
+        error: (error) => {
+          console.error('Error al eliminar chofer:', error);
+          alert(error);
+        }
+      });
+    }
   }
 }

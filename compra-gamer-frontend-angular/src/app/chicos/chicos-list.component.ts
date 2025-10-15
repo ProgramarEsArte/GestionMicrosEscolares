@@ -7,26 +7,55 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <h3>Chicos</h3>
-    <a routerLink="/chicos/new" class="create-link">Crear chico</a>
-    <ul class="list">
-      <li *ngFor="let c of chicos">
-        {{c.dni}} - {{c.nombre}} {{c.apellido}} (Micro: {{c.microPatente}})
-        <a [routerLink]="['/chicos', c.dni]" class="edit-link">Editar</a>
-      </li>
-    </ul>
-  `,
-  styles: [`
-    .list { list-style: none; padding: 0; }
-    .list li { padding: 8px; border-bottom: 1px solid #eee; }
-    .create-link { display: inline-block; margin-bottom: 1rem; padding: 8px 16px; background: #4CAF50; color: white; text-decoration: none; border-radius: 4px; }
-    .edit-link { margin-left: 1rem; padding: 4px 8px; background: #2196F3; color: white; text-decoration: none; border-radius: 4px; font-size: 0.9em; }
-  `]
+    <div class="page-container">
+      <div class="header-container">
+        <h3>Listado de Chicos</h3>
+        <a routerLink="/chicos/new" class="create-link">Nuevo Chico</a>
+      </div>
+      <div class="list-container">
+        <ul class="list">
+          <li *ngFor="let c of chicos" class="list-item">
+            <div class="item-info">
+              <span class="item-title">{{c.nombre}} {{c.apellido}}</span>
+              <span class="item-detail">DNI: {{c.dni}}</span>
+              <span class="item-detail">Transporte: {{c.microPatente || 'No asignado'}}</span>
+            </div>
+            <div class="item-actions">
+              <a [routerLink]="['/chicos', c.dni]" class="edit-link">Editar</a>
+              <button (click)="deleteChico(c.dni)" class="delete-button">Eliminar</button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  `
 })
 export class ChicosListComponent implements OnInit {
   chicos: any[] = [];
   constructor(private svc: ChicoService) {}
   ngOnInit(): void {
-    this.svc.getAll().subscribe(x => this.chicos = x);
+    this.loadChicos();
+  }
+
+  loadChicos(): void {
+    this.svc.getAll().subscribe({
+      next: (x) => this.chicos = x,
+      error: (error) => {
+        console.error('Error al cargar chicos:', error);
+        alert(error);
+      }
+    });
+  }
+
+  deleteChico(dni: string): void {
+    if (confirm('¿Está seguro que desea eliminar este chico?')) {
+      this.svc.delete(dni).subscribe({
+        next: () => this.loadChicos(),
+        error: (error) => {
+          console.error('Error al eliminar chico:', error);
+          alert(error);
+        }
+      });
+    }
   }
 }
