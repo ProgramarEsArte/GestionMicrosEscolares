@@ -165,6 +165,10 @@ dotnet test
 
 ## Desarrollo
 
+### Diseño y Arquitectura
+
+Este proyecto utiliza el patrón de diseño de Inyección de Dependencias (Dependency Injection) propio de .NET. Los servicios y el contexto de datos se inyectan por constructor en los controladores y otros servicios, lo que facilita el desacoplamiento y las pruebas unitarias.
+
 ### Desarrollo Local
 
 Para desarrollar nuevas características:
@@ -174,6 +178,9 @@ Para desarrollar nuevas características:
    - Crear la interfaz del servicio en `Services/`
    - Implementar el servicio
    - Crear el controlador en `Controllers/`
+
+
+### Desarrollo Local
 
 2. Frontend:
    - Crear el servicio en `services/`
