@@ -25,23 +25,49 @@ Aplicación Angular con componentes standalone:
 
 ## Requisitos Previos
 
+### Para Desarrollo Local
 1. .NET 7.0 SDK
 2. Node.js y npm
 3. MySQL Server
 4. Angular CLI
 
+### Para Docker
+1. Docker Desktop
+2. Docker Compose
+
 ## Configuración y Ejecución
 
-### Base de Datos
+### Usando Docker (Recomendado)
+
+El proyecto incluye archivos Docker para una configuración rápida:
+
+1. Construir y levantar los contenedores:
+```bash
+docker-compose up --build
+```
+
+Esto iniciará:
+- Base de datos MySQL (puerto 3306)
+- Backend API (.NET) (puerto 5037)
+- Frontend Angular (puerto 4200)
+
+Los servicios estarán disponibles en:
+- Frontend: `http://localhost:4200`
+- API: `http://localhost:5037`
+- MySQL: `localhost:3306`
+
+### Desarrollo Local
+
+#### Base de Datos
 
 1. Crear una base de datos MySQL
-2. Ejecutar los scripts de creación en orden:
+2. Ejecutar los scripts de creación:
 ```bash
 cd CompraGamer.Api/Scripts
 # Ejecutar los scripts en orden numérico
 ```
 
-### Backend (API)
+#### Backend (API)
 
 1. Configurar la cadena de conexión en `appsettings.json`:
 ```json
@@ -59,9 +85,7 @@ dotnet restore
 dotnet run
 ```
 
-La API estará disponible en `http://localhost:5037`
-
-### Frontend
+#### Frontend
 
 1. Instalar dependencias:
 ```bash
@@ -73,8 +97,6 @@ npm install
 ```bash
 ng serve
 ```
-
-La aplicación estará disponible en `http://localhost:4200`
 
 ## Características Principales
 
@@ -143,6 +165,8 @@ dotnet test
 
 ## Desarrollo
 
+### Desarrollo Local
+
 Para desarrollar nuevas características:
 
 1. Backend:
@@ -155,6 +179,37 @@ Para desarrollar nuevas características:
    - Crear el servicio en `services/`
    - Crear los componentes necesarios
    - Actualizar las rutas en `app.routes.ts`
+
+### Desarrollo con Docker
+
+1. Modificar archivos de código
+2. Reconstruir contenedores afectados:
+```bash
+# Para reconstruir un servicio específico
+docker-compose build frontend  # o backend
+# Para reconstruir y reiniciar
+docker-compose up --build -d frontend  # o backend
+```
+
+3. Para ver logs:
+```bash
+docker-compose logs -f [servicio]
+```
+
+### Variables de Entorno en Docker
+
+Los contenedores utilizan las siguientes variables de entorno que pueden ser modificadas en `docker-compose.yml`:
+
+#### Base de datos
+- `MYSQL_ROOT_PASSWORD`: Contraseña de root
+- `MYSQL_DATABASE`: Nombre de la base de datos
+
+#### Backend
+- `ConnectionStrings__GestionMicros`: Cadena de conexión a MySQL
+- `ASPNETCORE_ENVIRONMENT`: Entorno de ejecución
+
+#### Frontend
+- `API_URL`: URL del backend
 
 ## Contribuir
 
