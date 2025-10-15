@@ -7,29 +7,58 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <h3>Micros</h3>
-    <a routerLink="/micros/new" class="create-link">Crear micro</a>
-    <ul class="list">
-      <li *ngFor="let m of micros">
-        {{m.patente}} - Chofer: {{m.choferDni}} - Chicos: {{m.cantidadChicos}}
-        <a [routerLink]="['/micros', m.patente]" class="edit-link">Editar</a>
-      </li>
-    </ul>
-  `,
-  styles: [`
-    .list { list-style: none; padding: 0; }
-    .list li { padding: 8px; border-bottom: 1px solid #eee; }
-    .create-link { display: inline-block; margin-bottom: 1rem; padding: 8px 16px; background: #4CAF50; color: white; text-decoration: none; border-radius: 4px; }
-    .edit-link { margin-left: 1rem; padding: 4px 8px; background: #2196F3; color: white; text-decoration: none; border-radius: 4px; font-size: 0.9em; }
-  `]
+    <div class="page-container">
+      <div class="header-container">
+        <h3>Listado de Micros</h3>
+        <a routerLink="/micros/new" class="create-link">Nuevo Micro</a>
+      </div>
+      <div class="list-container">
+        <ul class="list">
+          <li *ngFor="let m of micros" class="list-item">
+            <div class="item-info">
+              <span class="item-title">Patente: {{m.patente}}</span>
+              <span class="item-detail">Conductor: {{m.choferDni || 'No asignado'}}</span>
+              <span class="item-detail">Alumnos: {{m.cantidadChicos}}</span>
+            </div>
+            <div class="item-actions">
+              <a [routerLink]="['/micros', m.patente]" class="edit-link">Editar</a>
+              <button (click)="deleteMicro(m.patente)" class="delete-button">Eliminar</button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  `
 })
 export class MicroListComponent implements OnInit {
   micros: any[] = [];
   constructor(private svc: MicroService) {}
   ngOnInit(): void {
-    this.svc.getAll().subscribe(x => {
-      console.log('Micros recibidos:', x);
-      this.micros = x;
+    this.loadMicros();
+  }
+
+  loadMicros(): void {
+    this.svc.getAll().subscribe({
+      next: (x) => {
+        console.log('Micros recibidos:', x);
+        this.micros = x;
+      },
+      error: (error) => {
+        console.error('Error al cargar micros:', error);
+        alert(error);
+      }
     });
+  }
+
+  deleteMicro(patente: string): void {
+    if (confirm('¿Está seguro que desea eliminar este micro?')) {
+      this.svc.delete(patente).subscribe({
+        next: () => this.loadMicros(),
+        error: (error) => {
+          console.error('Error al eliminar micro:', error);
+          alert(error);
+        }
+      });
+    }
   }
 }
